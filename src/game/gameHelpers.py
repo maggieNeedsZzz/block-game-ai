@@ -1,5 +1,6 @@
-from piece import Piece
+
 import random
+from game.piece import Pieces
 
 class ScoreCalculator():
     LINE_POINTS = 10
@@ -14,8 +15,7 @@ class ScoreCalculator():
         return currentScore + (points * combo *  runningCombo), runningCombo
 
 class PieceGenerator():  
-    pieceGenerator = Piece()
-    @classmethod
-    def generatePieces(cls) -> list:                
-        return [ cls.pieceGenerator.pieces[i] for i in random.sample(range(len(cls.pieceGenerator.pieces)), 3) ]
+    @staticmethod
+    def generatePieces() -> list:   
+        return random.sample(Pieces.getPieces(), 3) 
 

@@ -178,5 +178,5 @@ cython_debug/
 /old-code
 /envs
 /android
-/src
+/src/main_testing.py
 testing_notebook.ipynb

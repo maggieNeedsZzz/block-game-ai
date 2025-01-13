@@ -1,7 +1,7 @@
 import pygame
-from gameLogic import Game
-from gameStates import PlayingState, GeneratingPiecesState
-from ui import UI
+from game.game import Game
+from game.states.state import  GeneratingPiecesState
+from ui.ui import UI
 import numpy as np
 
 def handleInput(ui : UI, event):
@@ -58,8 +58,8 @@ while running:
     ui.drawStaticUI()
 
     ui.drawScore()
-    ui.drawRoundPlayablePieces()
-    ui.drawPiecesInBoard()
+    ui.drawPlayablePieces()
+    ui.drawBoardPieces()
 
 
     # Game state update

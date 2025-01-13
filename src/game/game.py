@@ -1,16 +1,10 @@
 import numpy as np
-# import matplotlib.pyplot as plt
-# from enum import Enum
-# import sys
-from itertools import permutations
-# import copy
 import random
-# import typing
 
-from board import BlockBoard
-from action import PlacePiece
-from ui import UI
-from helpers import PieceGenerator
+from game.board import BlockBoard
+from game.commands.placePiece import PlacePiece
+from ui.ui import UI
+from game.gameHelpers import PieceGenerator
 
 class Game():
     def __init__(self, seed, ui : UI):

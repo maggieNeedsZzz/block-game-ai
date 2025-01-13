@@ -1,12 +1,11 @@
 
 import numpy as np
 import copy
-from board import BlockBoard
-from helpers import ScoreCalculator
-from action import PlacePiece
+from game.board import BlockBoard
+from game.commands.placePiece import PlacePiece
 
 
-class GameState():
+class GameTree():
     def __init__(self, board, playablePieces, score, runningCombo, parent=None):
         self.parent = parent
         self.children = []
@@ -52,7 +51,7 @@ class GameState():
                 # print([p for p in self.playablePieces])
                 newPlayableBlocks = copy.deepcopy([p for p in self.playablePieces if not np.array_equal(p, piece)])
                 # print("Blcks left", newPlayableBlocks)
-                childState = GameState(newBoard, newPlayableBlocks, newScore, newRunningCombo, self)
+                childState = GameTree(newBoard, newPlayableBlocks, newScore, newRunningCombo, self)
                 childState.generateChildren()   # Recursively generate children
                 self.children.append(childState)
 
@@ -65,21 +64,15 @@ class GameState():
         availablePositions = []
         for i in range(self.board.getBoard().shape[0] - piece.shape[0]+1):
             for j in range(self.board.getBoard().shape[1] - piece.shape[1]+1):
-                if self.board.canFit(piece,[i,j]):
+                if self.board.canPieceFit(piece,[i,j]):
                     availablePositions.append([i,j])
-                    # newBoard : BlockBoard = copy.deepcopy(self.board.getBoard())      #works, but maybe look into manual copy
-                    # newBoard.addPiece(piece,[i,j])
-                    # fits.append(ActionNode(newBoard,piece,[i,j],boardState))
-        #[print("This is where I fit",i.board.board) for i in fits]
         return availablePositions
 
 
 
     def getSequenceOfBoardsToRoot(self):
         sequence = []
-        # sequence.append(self)
         currentState = self
-        # currentState : GameState = state
         while currentState.parent != None:
             sequence.append(currentState)
             currentState = currentState.parent
@@ -88,7 +81,7 @@ class GameState():
     
 
 
-class GameStateWithPlacements(GameState):
+class GameTreeWithPlacements(GameTree):
     def __init__(self, board, playablePieces, score, runningCombo, parent=None, positionSequence=[], pieceSequence=[]):
         super().__init__(board, playablePieces, score, runningCombo, parent)
         self.positionSequence = positionSequence
@@ -120,7 +113,7 @@ class GameStateWithPlacements(GameState):
                 # print([p for p in self.playablePieces])
                 newPlayableBlocks = copy.deepcopy([p for p in self.playablePieces if not np.array_equal(p, piece)])
                 # print("Blcks left", newPlayableBlocks)
-                childState = GameStateWithPlacements(newBoard, newPlayableBlocks, newScore, newRunningCombo, self, newPositionSequence, newPieceSequence)
+                childState = GameTreeWithPlacements(newBoard, newPlayableBlocks, newScore, newRunningCombo, self, newPositionSequence, newPieceSequence)
                 childState.generateChildren()   # Recursively generate children
                 self.children.append(childState)
 
