@@ -7,10 +7,20 @@ class ScoreCalculator():
     COMBO_MULTIPLIER = 2
 
     @classmethod
-    def calculateNewScore(cls, currentScore, runningCombo, numberoOfLines):
+    def calculateNewScore(cls, currentScore, runningCombo, numberOfLines):
         points = 0
-        points += (cls.LINE_POINTS * numberoOfLines)
+        points += (cls.LINE_POINTS * numberOfLines)
         runningCombo = runningCombo + 1 if points > 0 else runningCombo
+        # combo = cls.COMBO_MULTIPLIER if points/10 > 2 else 1 # Dont remember what this is
+        return currentScore + (points *  runningCombo), runningCombo
+        # return currentScore + (points * combo *  runningCombo), runningCombo
+
+
+    def calculateNewScoreWithPiece(cls,piece, currentScore, runningCombo, numberOfLines):
+        points = 0
+        points += (cls.LINE_POINTS * numberOfLines)
+        runningCombo = runningCombo + 1 if points > 0 else runningCombo
+        points += piece.sum()
         combo = cls.COMBO_MULTIPLIER if points/10 > 2 else 1
         return currentScore + (points * combo *  runningCombo), runningCombo
 

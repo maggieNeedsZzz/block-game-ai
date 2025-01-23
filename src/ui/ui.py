@@ -1,19 +1,25 @@
 import pygame
 from ui.boardObject import BoardObject
 from ui.pieceObject import PieceObject
+from game.observer import Observer
 
 class StaticUI():
     def __init__(self):
         pass
+import math
 
-class UI():
-    def __init__(self):
+import numpy as np
+
+class UI(Observer):
+    def __init__(self, boardCellWidth = 6):
+        super().__init__()
         ### Screen
         SCREEN_WIDTH = 360
         SCREEN_HEIGHT = 640 
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("Pygame Test")
 
+        self.boardCellWidth = boardCellWidth
 
 
 
@@ -69,11 +75,11 @@ class UI():
         }
 
         
-        ## Score
+        # Score
         self.textFont = pygame.font.SysFont('Arial', 32)
         self.score = self.textFont.render("0", True, "#000000")  
         ## Board Content
-        self.boardSquares = BoardObject(6, self.boardX, self.BOARD_Y, self.boardWidthSize//6)
+        self.boardSquares = BoardObject(boardCellWidth, self.boardX, self.BOARD_Y, self.boardWidthSize//boardCellWidth)
         ## Pieces to Play
         self.playablePieces = []
             
@@ -85,28 +91,48 @@ class UI():
         return self.playablePieces[pieceIndex].color
 
 
+    def onNotify(self, game, event):
+
+        if event == "newRound":
+            pieceList = []
+            for i, piece in enumerate(game.playablePieces):
+                pieceSprite = PieceObject(self.pieceSize, piece, self.pieceXPositions[i], self.piecesY)
+                pieceList.append(pieceSprite)
+                self.playablePieces = pieceList
+
+        elif event == "piecePlayed":
+            colorToAdd, idx = self._findMissingPiece(game)
+            self.boardSquares.update(game.board.getBoard(), colorToAdd)
+            self.playablePieces.pop(idx)
+
+        elif event == "logicDone":
+            self.boardSquares.update(game.board.getBoard())
+            self.score = self.textFont.render(str(game.score), True, "#000000")
+
+    def _findMissingPiece(self, game):
+        colorToAdd = None
+        idx = 0
+        for pieceObject in self.playablePieces:
+            if not any(np.array_equal(pieceObject.piece, piece) for piece in game.playablePieces):
+                colorToAdd = pieceObject.color
+                return colorToAdd, idx
+            idx += 1
+        print("ERROS: Something is ")
+        return 
 
 
     ### Define UI elements                    
-    def setScore(self, score):
-        self.score = self.textFont.render(str(score), True, "#000000")
+    # def setScore(self, score):
+        # self.score = self.textFont.render(str(score), True, "#000000")
         # self.screen.blit(self.score, (self.screen/2 - self.score.get_width()/2, 2))
 
 
-    def setPlayablePieces(self, pieces):
-        pieceList = []
-        for i, piece in enumerate(pieces):
-            pieceSprite = PieceObject(self.pieceSize, piece, self.pieceXPositions[i], self.piecesY)
-            pieceList.append(pieceSprite)
-        self.playablePieces = pieceList
 
-    def removePlayablePiece(self, pieceIndex):
-        self.playablePieces.pop(pieceIndex)
+    # def removePlayablePiece(self, pieceIndex):
+    #     self.playablePieces.pop(pieceIndex)
         
 
 
-    def updateBoardPiecesWithColor(self, board, color):
-        self.boardSquares.update(board, color)
 
 
 
@@ -137,18 +163,25 @@ class UI():
     def drawStaticUI(self):
         self.screen.fill("#cdb4db")
         pygame.draw.rect(self.screen,"#bde0fe", self.board)
-        self.drawBoardGrid(self.board, 6)
+        self.drawBoardGrid(self.board, self.boardCellWidth)
         pygame.draw.rect(self.screen,"#ffafcc", self.pieceShowcase)
 
 
     def drawBoardGrid(self, board, gridSize=6):
-        blockSize = board.width // gridSize
+        blockSize = math.ceil( board.width/ gridSize) #board.width // gridSize
+        
         # blockSize = 20 #Set the size of the grid block
         for x in range(0, board.width, blockSize):
             for y in range(0, board.height, blockSize):
                 rect = pygame.Rect(x + board.x, y + board.y, blockSize, blockSize)
                 pygame.draw.rect(self.screen, "#a2d2ff", rect, 1)
 
+    def draw(self):
+        self.drawStaticUI()
+
+        self.drawScore()
+        self.drawPlayablePieces()
+        self.drawBoardPieces()
 
 
 

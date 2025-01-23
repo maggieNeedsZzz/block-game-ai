@@ -13,10 +13,10 @@ class Pieces():
         "Corner_U_R": np.asarray([[True,True],[False,True]]),
         "Corner_D_L": np.asarray([[True,False],[True,True]]),
         "Corner_D_R": np.asarray([[False,True],[True,True]]),
-        "ThreeBlock": np.asarray([[True,True,True],[True,True,True],[True,True,True]]),
+        # "ThreeBlock": np.asarray([[True,True,True],[True,True,True],[True,True,True]]),
         "TwoBlock": np.asarray([[True,True],[True,True]]),
-        "Five_H_Line": np.asarray([[True,True,True,True,True]]),
-        "Five_V_Line": np.asarray([[True],[True],[True],[True],[True]]),
+        # "Five_H_Line": np.asarray([[True,True,True,True,True]]),
+        # "Five_V_Line": np.asarray([[True],[True],[True],[True],[True]]),
         "TwoDiagonalPositive": np.asarray([[False,True],[True,False]])
     }
     @classmethod

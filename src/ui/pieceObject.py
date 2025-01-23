@@ -21,6 +21,7 @@ class PieceObject():
     """
     def __init__(self, pieceSize, piece, x, y, color=None):
         self.rectArray = []
+        self.piece = piece
         if color is not None:
             self.color = color
         else:
@@ -28,6 +29,9 @@ class PieceObject():
         self.pieceSquareSize = pieceSize//5 
         self.createPiece(piece)
         self.placePiece(x, y)
+
+    def __eq__(self, value : 'PieceObject'):
+        return np.array_equal(self.rectArray, value.rectArray) and self.color == value.color
 
     def createPiece(self, piece : np.ndarray):
         # pieceSquareSizeY = self.pieceSize//piece.shape[0]

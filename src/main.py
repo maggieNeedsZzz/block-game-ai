@@ -1,6 +1,5 @@
 import pygame
 from game.game import Game
-from game.states.state import  GeneratingPiecesState
 from ui.ui import UI
 import numpy as np
 
@@ -49,28 +48,15 @@ seed = 2
 np.random.seed(seed)
 
 
-ui = UI()
-game = Game(seed, ui)
-state = GeneratingPiecesState()
+game = Game(seed)
 
 running = True
 while running:
-    ui.drawStaticUI()
-
-    ui.drawScore()
-    ui.drawPlayablePieces()
-    ui.drawBoardPieces()
-
-
-    # Game state update
-    state.update(game)
-    if state.isCompleted():      
-        state = state.onExit(game)      
-        state.onEnter(game)
-
+    game.ui.draw()
+    game.update()
 
     for event in pygame.event.get():        
-        exit = handleInput(ui, event)
+        exit = handleInput(game.ui, event)
         if exit or event.type == pygame.QUIT:
             running = False
     

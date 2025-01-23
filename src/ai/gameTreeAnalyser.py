@@ -1,5 +1,6 @@
 
 from ai.gameTree import GameTree
+from ai.heuristic import Heuristic
 
 class GameTreeAnalyser:
     leafList = []
@@ -19,19 +20,30 @@ class GameTreeAnalyser:
         return cls.leafList
     
     @classmethod
-    def getBestLeafState(cls, treeRootNode : GameTree) -> (GameTree, int): 
-        cls.findBestLeafState(treeRootNode)
+    def getBestLeafState(cls, treeRootNode : GameTree, heuristic : Heuristic = None) -> (GameTree, int): 
+        cls.findBestLeafState(treeRootNode, heuristic)
+        # print("Board is: " + str(cls.bestLeaf.board.board))
         return cls.bestLeaf, cls.bestLeafScore
     
     @classmethod
-    def findBestLeafState(cls, node : GameTree): 
-        if node.isLeaf() or node.isTerminal():
-            if node.score > cls.bestLeafScore:
+    def findBestLeafState(cls, node : GameTree, heuristic : Heuristic = None): 
+        if node.isLeaf():
+            if heuristic != None:
+                # print()
+                # print("~~~~~~~~~~~~~~~~~~")
+                # print("heuristic score: " + str(heuristic.calculateScore(node)))
+                # print("score: " + str(node.score))
+                # print("~~~~~~~~~~~~~~~~~~")
+                # print()
+                nodeScore = heuristic.calculateScore(node)
+            else: 
+                nodeScore = node.score
+            if nodeScore > cls.bestLeafScore:
                 cls.bestLeafScore = node.score
                 cls.bestLeaf = node
         else:
             for child in node.children:
-                cls.findBestLeafState(child)
+                cls.findBestLeafState(child, heuristic)
 
     @classmethod
     def findLeafStates(cls, node : GameTree): 

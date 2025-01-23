@@ -27,7 +27,20 @@ class BlockBoard():
                 for j in range(piece.shape[1]):
                     self.board[position[0] + i, position[1] + j] = piece[i][j] | self.board[position[0] + i, position[1] + j]
             
-                    
+
+    def isPositionAvailable(self, piece):
+        for i in range(self.board.shape[0] - piece.shape[0]+1):
+            for j in range(self.board.shape[1] - piece.shape[1]+1):
+                if self.canPieceFit(piece,[i,j]):
+                    return True
+        return False                    
+
+    
+    def isPositionAvailableForPieces(self, pieces):
+        for piece in pieces:
+            if self.isPositionAvailable(piece):
+                return True 
+        return False
 
 
     def canPieceFit(self, piece : np.ndarray, position):
@@ -41,6 +54,17 @@ class BlockBoard():
                     return False
 
         return True
+    
+
+    # def canPieceFit(self, piece : np.ndarray, position, board : np.ndarray):
+    #     for i in range(piece.shape[0]):
+    #         for j in range(piece.shape[1]):
+    #             if (position[0] + i >= board.shape[0] or position[1] + j >= board.shape[1]) and piece[i,j]:
+    #                 return False
+    #             if board[position[0] + i, position[1] + j] and piece[i][j]:
+    #                 return False
+
+    # return True
     
 
     # def getState(self):
