@@ -4,15 +4,62 @@ import copy
 from game.board import BlockBoard
 from game.commands.placePiece import PlacePiece
 
+import random
+class RandomSequenceGenerator:
+    def __init__(self, board, playablePieces):
+        self.board : BlockBoard = copy.deepcopy(board)
+        self.playablePieces =  copy.deepcopy(playablePieces)
+        self.isGameOver = False 
+        
+        self.positionSequence = []
+        self.pieceSequence = []
+
+    def getAvailablePositions(self, piece):
+        availablePositions = []
+        for i in range(self.board.getBoard().shape[0] - piece.shape[0]+1):
+            for j in range(self.board.getBoard().shape[1] - piece.shape[1]+1):
+                if self.board.canPieceFit(piece,[i,j]):
+                    availablePositions.append([i,j])
+        return availablePositions
+
+
+
+    def generateSequence(self):
+
+        # Can run into issues if piece chosen to be played does not fit in the current board, 
+        # but some  other piece does fit, 
+        # this function gives up when it encounter the first piece that does not fit
+        # however, the game loop will wait for a play
+        # TODO: fix that
+        for _ in  range(len(self.playablePieces)):# > 0:
+            random.shuffle(self.playablePieces)
+            piece = self.playablePieces.pop(0)
+            availablePos = self.getAvailablePositions(piece)
+            if len(availablePos) != 0:
+                # position = random.choice(availablePos)
+                position = availablePos[0]
+                placeAction = PlacePiece(piece, position, self.board, 0, 0)
+                board, _ , _, _ = placeAction.execute()
+                self.board = board
+                self.positionSequence.append(position)
+                self.pieceSequence.append(piece)
+            else:
+                self.isGameOver = True
+                self.score = -100 # penalty
+
+        return list(zip(self.pieceSequence,self.positionSequence) )
+                    
+
 
 class GameTree():
-    def __init__(self, board, playablePieces, score, runningCombo, parent=None):
+    def __init__(self, board, playablePieces, score, runningCombo, numberOfLines, parent=None):
         self.parent = parent
         self.children = []
         self.board : BlockBoard = board
         self.playablePieces = playablePieces
         self.score = score
         self.runningCombo = runningCombo
+        self.numberOfLines = numberOfLines
         self.isGameOver = False 
 
     # No blocks left to place
@@ -92,8 +139,8 @@ class GameTree():
 
 
 class GameTreeWithPlacements(GameTree):
-    def __init__(self, board, playablePieces, score, runningCombo, parent=None, positionSequence=[], pieceSequence=[]):
-        super().__init__(board, playablePieces, score, runningCombo, parent)
+    def __init__(self, board, playablePieces, score, runningCombo, numberOfLines, parent=None, positionSequence=[], pieceSequence=[]):
+        super().__init__(board, playablePieces, score, runningCombo,numberOfLines, parent)
         self.positionSequence = positionSequence
         self.pieceSequence = pieceSequence
         
@@ -101,15 +148,17 @@ class GameTreeWithPlacements(GameTree):
 
     def _createNewNode(self, piece : np.ndarray, position) -> 'GameTree':
         newBoard : BlockBoard = copy.deepcopy(self.board)     
+        newScore = copy.deepcopy(self.score)
+        newRunningCombo = copy.deepcopy(self.runningCombo)
+
         newPositionSequence : [] = copy.deepcopy(self.positionSequence)     
         newPositionSequence.append(position)
 
         newPieceSequence : [] = copy.deepcopy(self.pieceSequence)     
         newPieceSequence.append(piece)
 
-        placeAction = PlacePiece(piece, position, newBoard, self.score, self.runningCombo)
-        newBoard, newScore, newRunningCombo = placeAction.execute()
-        # newScore += piece.sum()
+        placeAction = PlacePiece(piece, position, newBoard, newScore, newRunningCombo)
+        newBoard, newScore, newRunningCombo, numberOfLines = placeAction.execute()
         newPlayableBlocks = copy.deepcopy([p for p in self.playablePieces if not np.array_equal(p, piece)])
         # if len(newPlayableBlocks) == 0:
         #     currentNode = self
@@ -119,7 +168,7 @@ class GameTreeWithPlacements(GameTree):
         #     if  self.runningCombo == startNode.runningCombo:
         #         self.runningCombo == 1
 
-        return GameTreeWithPlacements(newBoard, newPlayableBlocks, newScore, newRunningCombo, self, newPositionSequence, newPieceSequence)
+        return GameTreeWithPlacements(newBoard, newPlayableBlocks, newScore, newRunningCombo, numberOfLines, self, newPositionSequence, newPieceSequence)
         
 
 

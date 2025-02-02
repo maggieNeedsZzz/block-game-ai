@@ -38,7 +38,7 @@ class Game(Publisher):
         #runtime
         self.playablePieces = None
         self.score = 0
-        self.runningCombo = 0
+        self.runningCombo = 1
         self.roundCombo = False
 
         self.isGameOver = False
@@ -88,7 +88,7 @@ class Game(Publisher):
         self.notify(self, "piecePlayed")
         
     def activateBoardLogic(self):
-        newBoard, newScore, newRunningCombo = BoardLogic.execute(self.board, self.runningCombo, self.score)
+        newBoard, newScore, newRunningCombo, newLines= BoardLogic.execute(self.board, self.runningCombo, self.score)
         self.board = newBoard
         self.score = newScore
         self.runningCombo = newRunningCombo
@@ -97,7 +97,6 @@ class Game(Publisher):
         
 
     def update(self):
-
         # Game state update 
         self.state.update(self)
         self.ai.update(self)

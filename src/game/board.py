@@ -118,5 +118,5 @@ class BoardLogic():
         for i in clearColIndexes:
             board.getBoard().T[i].fill(False)
 
-        return board, newScore, newRunningCombo
+        return board, newScore, newRunningCombo, numberOfLines
 

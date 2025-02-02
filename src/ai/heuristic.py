@@ -6,8 +6,9 @@ from game.gameHelpers import ScoreCalculator
 class Heuristic:
     # Its gonna be the score achieved by clearing the whole board
     MAX_SCORE_PER_PIECE_PLACEMENT = ScoreCalculator.LINE_POINTS * 6 * 2 # SCore * size * both directions
+    MAX_SCORE_PER_ROUND = MAX_SCORE_PER_PIECE_PLACEMENT  + (6 * ScoreCalculator.LINE_POINTS)
     # TODO: Needs to be turned to a instantiable class so that the board size can be defined on init
-    MAX_EXPECTED_COMBO_MULTIPLIER = 50 
+    MAX_EXPECTED_COMBO_MULTIPLIER = 30 
     # TODO: actually implement a combo cap
     @abstractmethod
     def calculateScore(self, gameTreeNode : GameTree) -> float:
@@ -25,9 +26,10 @@ class MaximizeScoreAndComboHeuristic(Heuristic):
         
     @classmethod
     def calculateScore(cls, gameTreeNode : GameTree) -> float:
-        normalizedScore = gameTreeNode.score / cls.MAX_SCORE_PER_PIECE_PLACEMENT
+        normalizedScore = gameTreeNode.score / (cls.MAX_SCORE_PER_ROUND * cls.MAX_EXPECTED_COMBO_MULTIPLIER)
         normalizedCombo = gameTreeNode.runningCombo / cls.MAX_EXPECTED_COMBO_MULTIPLIER
-        return cls.scoreWeight*normalizedScore + (1- cls.scoreWeight )*normalizedCombo 
+        return cls.scoreWeight*normalizedScore + (1 - cls.scoreWeight )*normalizedCombo
+        # return  normalizedScore
 
 class FitsBigPiecesHeuristic(Heuristic):
     scoreWeight = 0.5
@@ -40,25 +42,28 @@ class FitsBigPiecesHeuristic(Heuristic):
     
     
 class EmptySquaresHeuristic(MaximizeScoreAndComboHeuristic):
-    scoreWeight = 0.3
+    scoreWeight = 0.8
         
     @classmethod
     def calculateScore(cls, gameTreeNode : GameTree) -> float:
         score = super().calculateScore(gameTreeNode)
         normalizedNbrOfEmptySquares = gameTreeNode.board.getNumberOfEmptySquares() / (gameTreeNode.board.board.shape[0] * gameTreeNode.board.board.shape[1])
-        return cls.scoreWeight*score + (1- cls.scoreWeight) * normalizedNbrOfEmptySquares
+        # return  normalizedNbrOfEmptySquares
+        return score 
+        # return cls.scoreWeight*score + (1- cls.scoreWeight) * normalizedNbrOfEmptySquares
     
 
 import numpy as np
 class InteruptionsHeuristic(MaximizeScoreAndComboHeuristic):
     scoreWeight = 0.1
     # TODO
-    MAX_DISPERSION = 2*  (6 - 1)*(6 - 1) # Its gonna be a checker pattern ´
+    MAX_DISPERSION = 2*  (8 - 1)*(8 - 1) # Its gonna be a checker pattern ´
     
         
     @classmethod
     def calculateScore(cls, gameTreeNode : GameTree) -> float:
         # score = super().calculateScore(gameTreeNode)
+
         normalizedInteruptionValue = (cls.MAX_DISPERSION - InteruptionsHeuristic.cal(gameTreeNode.board.board)) / cls.MAX_DISPERSION
         # print(score)
         # print(normalizedInteruptionValue)

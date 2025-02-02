@@ -23,23 +23,26 @@ class GameTreeAnalyser:
     def getBestLeafState(cls, treeRootNode : GameTree, heuristic : Heuristic = None) -> (GameTree, int): 
         cls.findBestLeafState(treeRootNode, heuristic)
         # print("Board is: " + str(cls.bestLeaf.board.board))
+        print(cls.bestLeaf.score )
+        print(cls.bestLeaf.runningCombo)
         return cls.bestLeaf, cls.bestLeafScore
     
     @classmethod
     def findBestLeafState(cls, node : GameTree, heuristic : Heuristic = None): 
         if node.isLeaf():
             if heuristic != None:
+                nodeScore = heuristic.calculateScore(node)
                 # print()
                 # print("~~~~~~~~~~~~~~~~~~")
-                # print("heuristic score: " + str(heuristic.calculateScore(node)))
                 # print("score: " + str(node.score))
                 # print("~~~~~~~~~~~~~~~~~~")
                 # print()
-                nodeScore = heuristic.calculateScore(node)
+                # print("heuristic score: " + str(nodeScore))
             else: 
                 nodeScore = node.score
+            
             if nodeScore > cls.bestLeafScore:
-                cls.bestLeafScore = node.score
+                cls.bestLeafScore = nodeScore
                 cls.bestLeaf = node
         else:
             for child in node.children:
