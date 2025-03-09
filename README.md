@@ -71,5 +71,5 @@ I also brushed up on my game tree and AI heuristic skills.
 
 The bigger and emptier the board, the larger the action tree. If there are many possible plays, the search space grows exponentially. To handle this, I made the AI play randomly when the board had many open squares. However, this could also be improved by:
 
-- Implementing a search time lime;
+- Implementing a search time limit;
 - Implementing parallel tree search.
