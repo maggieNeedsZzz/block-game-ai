@@ -30,7 +30,7 @@ All moving parts are updated in the game loop: the game, UI, and AI, using the `
 
 ## The AI
 
-The AI is a basic game tree. I thought about using Reinforcement Learning (RL), but the action space is too large, and there are clear rules and heuristics that can be implemented for a good AI.
+The AI is just basic game tree search. I thought about using Reinforcement Learning (RL), but the action space is too large, and there are clear rules and heuristics that can be implemented for a good AI.
 
 When the pieces of the round are defined, a game tree is created with all the possible sequences of piece placements on the board. Each node stores helpful information for the AI, such as:
 
